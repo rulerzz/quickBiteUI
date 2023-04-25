@@ -1,13 +1,17 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { StyleSheet, View} from "react-native";
 import {Button, Icon, Text} from "@rneui/themed";
+import {storage} from "../screens/AppComponent";
+import {Item} from "../models/Restraunt";
 
 const CartComponent = () => {
+    const [cart, setCart] = React.useState<Item[]>([]);
+
     return (
             <Button buttonStyle={styles.button} containerStyle={styles.buttonContainer}>
                 <View style={styles.cartBox}>
                     <Icon type='font-awesome' name="opencart" color="white" style={styles.cartButton}/>
-                    <View style={styles.cartItems}><Text style={{color: 'white'}}>2</Text></View>
+                    <View style={styles.cartItems}><Text style={{color: 'white'}}>{cart.length}</Text></View>
                 </View>
                 <Text style={styles.cartText}>CART</Text>
                 <Text style={styles.currency}>GBP 33</Text>

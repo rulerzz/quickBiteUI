@@ -2,26 +2,38 @@ import React from 'react';
 import {View, Text, ScrollView, StyleSheet} from 'react-native';
 import BestSellerItemComponent from "./BestSellerItem";
 import CategoryItemComponent from "./CategoryItemComponent";
+import {Button} from "@rneui/themed";
+import {Category} from "../models/Restraunt";
 
-const CategoryChooseComponent = () => {
+const CategoryChooseComponent = (props) => {
+
+    const sendDataToParent = (category: Category) => {
+        props.setActiveCategoryForHome(category);
+    };
+
+    const renderAllButton = () => {
+        if(props.categorySelected){
+            return <Button size="md" containerStyle={styles.button} title="All" onPress={() => {sendDataToParent(null)}}>
+            </Button>
+        }
+        else{
+            return <Button size="md" color="rgba(37, 211, 102, 1)" containerStyle={styles.button} title="All" onPress={() => {sendDataToParent(null)}}>
+            </Button>
+        }
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.text}>Choose from Category</Text>
             <View style={styles.innerContainer}>
                 <ScrollView style={styles.scrollView} horizontal={true} contentContainerStyle={{display: 'flex',
                     alignItems: 'flex-start'}} showsHorizontalScrollIndicator={false}>
-                    <CategoryItemComponent title="itemname"></CategoryItemComponent>
-                    <CategoryItemComponent title="itemname"></CategoryItemComponent>
-                    <CategoryItemComponent title="itemname"></CategoryItemComponent>
-                    <CategoryItemComponent title="itemname"></CategoryItemComponent>
-                    <CategoryItemComponent title="itemname"></CategoryItemComponent>
-                    <CategoryItemComponent title="itemname"></CategoryItemComponent>
-                    <CategoryItemComponent title="itemname"></CategoryItemComponent>
-                    <CategoryItemComponent title="itemname"></CategoryItemComponent>
-                    <CategoryItemComponent title="itemname"></CategoryItemComponent>
-                    <CategoryItemComponent title="itemname"></CategoryItemComponent>
-                    <CategoryItemComponent title="itemname"></CategoryItemComponent>
-                    <CategoryItemComponent title="itemname"></CategoryItemComponent>
+                    {
+                        props.categories.map((category: Category, key: number) => {
+                            return <CategoryItemComponent item={category} key={key} sendDataToParent={sendDataToParent} categorySelected={props.categorySelected}></CategoryItemComponent>
+                        })
+                    }
+                    {renderAllButton()}
                 </ScrollView>
             </View>
         </View>
@@ -39,6 +51,12 @@ const styles = StyleSheet.create({
     },
     text:{
         paddingLeft: 20
+    },
+    button: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 10,
+        borderRadius: 5
     }
 });
 export default CategoryChooseComponent;

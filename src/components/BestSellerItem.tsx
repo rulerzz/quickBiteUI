@@ -1,20 +1,23 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, ActivityIndicator, Pressable} from 'react-native';
 import {Card, Image} from "@rneui/themed";
 
-const BestSellerItemComponent = () => {
+const BestSellerItemComponent = (props) => {
     return (
+        <Pressable onPress={() => props.sendDataToParent(props.item)}>
             <Card containerStyle={styles.card}>
                 <View style={styles.innerView}>
                     <Image
                         style={styles.image}
                         resizeMode="cover"
-                        source={require("../assets/images/Quick.png")}
+                        source={{uri: props.item.image}}
+                        PlaceholderContent={<ActivityIndicator />}
                     />
                 </View>
-                <Text style={styles.heading}>Best Seller</Text>
-                <Text style={styles.text}>100GBP</Text>
+                <Text style={styles.heading} ellipsizeMode='tail' numberOfLines={1}>{props.item.name}</Text>
+                <Text style={styles.text}>₹ {props.item.price}</Text>
             </Card>
+        </Pressable>
     );
 };
 
@@ -23,7 +26,7 @@ const styles = StyleSheet.create({
     },
     card: {
         borderRadius: 10,
-        padding: 0,
+        padding: 0
     },
     image: {
         aspectRatio: 16/9,
@@ -38,8 +41,10 @@ const styles = StyleSheet.create({
     },
     heading:{
         color: 'black',
-        paddingLeft: 20,
+        paddingHorizontal: 20,
         marginTop: 5,
+        overflow: 'hidden',
+        maxWidth: 160,
         fontWeight: "bold"
     }
 });

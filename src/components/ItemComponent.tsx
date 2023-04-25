@@ -1,21 +1,22 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import {Button, Card, Image} from "@rneui/themed";
 
-const ItemComponent = () => {
+const ItemComponent = (props) => {
     return (
         <Card containerStyle={styles.card} wrapperStyle={styles.cardWrapper}>
             <View style={styles.innerView1}>
-                <Text style={styles.heading}>Best Seller</Text>
-                <Text style={styles.text}>100GBP</Text>
-                <Button title="VIEW" buttonStyle={styles.button}></Button>
+                <Text style={styles.heading}>{props.item.name}</Text>
+                <Text style={styles.text}>₹ {props.item.price}</Text>
+                <Button title="VIEW" buttonStyle={styles.button} onPress={() => props.sendDataToParent(props.item)}></Button>
             </View>
             <View style={styles.innerView2}>
                 <Image
                     style={styles.image}
                     resizeMode="cover"
                     containerStyle={styles.imageContainer}
-                    source={require("../assets/images/Quick.png")}
+                    source={{ uri : props.item.image}}
+                    PlaceholderContent={<ActivityIndicator />}
                 />
             </View>
         </Card>

@@ -1,33 +1,45 @@
 import React from 'react';
 import {View, Text, StyleSheet, StatusBar, SafeAreaView, ScrollView} from 'react-native';
 import ItemComponent from "./ItemComponent";
+import {Category, Item} from "../models/Restraunt";
 
-const ItemViewerComponent = () => {
-    return (
-                <View style={styles.view}>{
-                    [1,2,3,4,5].map((item, key) => {
-                                if (key === 0) {
-                                    return <View>
-                                        <Text style={styles.text}>Starter</Text>
-                                        <ItemComponent></ItemComponent>
-                                        <ItemComponent></ItemComponent>
-                                        <ItemComponent></ItemComponent>
-                                    </View>
+const ItemViewerComponent = (props) => {
+    const sendDataToParent = (item: Item) => {
+        props.setActiveItemForItemViewer(item);
+    };
+    if(props.categories){
+        return (
+            <View style={styles.view}>{
+                (props.categorySelected ? props.categories.filter(el => el.name === props.categorySelected) : props.categories).map((category: Category, key1: number) => {
+                        if (key1 === 0) {
+                                return <View key={key1}>
+                                    <Text style={styles.text}>{category?.name}</Text>
+                                    {
+                                        category.items.map((item: Item, key2: number) => {
+                                            return <ItemComponent item={item} key={key2} sendDataToParent={sendDataToParent}></ItemComponent>
+                                        })
+                                    }
+                                </View>
+                        } else {
+                                return <View key={key1} style={styles.textMarginTop}>
+                                    <Text style={styles.text}>{category?.name}</Text>
+                                    {
+                                        category.items.map((item: Item, key2: number) => {
+                                            return <ItemComponent item={item} key={key2} sendDataToParent={sendDataToParent}></ItemComponent>
+                                        })
+                                    }
+                                </View>
                                 }
-                                else{
-                                    return <View>
-                                        <Text style={styles.textMarginTop}>Starter</Text>
-                                        <ItemComponent></ItemComponent>
-                                        <ItemComponent></ItemComponent>
-                                        <ItemComponent></ItemComponent>
-                                    </View>
-                                }
-                            }
-                        )
                     }
+                )
+            }
 
-                </View>
-    );
+            </View>
+        );
+    }else{
+        return (<></>)
+    }
+
 };
 
 const styles = StyleSheet.create({
@@ -38,7 +50,6 @@ const styles = StyleSheet.create({
         paddingLeft: 20
     },
     textMarginTop:{
-        paddingLeft: 20,
         marginTop: 15
     }
 });
