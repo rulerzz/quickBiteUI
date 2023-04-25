@@ -11,6 +11,7 @@ import QrScanScreen from "./QrScanScreen";
 const Stack = createNativeStackNavigator();
 import { MMKV } from 'react-native-mmkv';
 import ItemViewerScreen from "./ItemViewerScreen";
+import CartScreen from "./CartScreen";
 
 const AppComponent = () => {
     return (
@@ -34,6 +35,9 @@ const AppComponent = () => {
                         );
                     },
                     gestureDirection: "horizontal"}}/>
+                <Stack.Screen name="cartScreen" component={CartScreen} options={{
+                    title : "cart"
+                }}/>
                 <Stack.Screen name="qrScan" component={QrScanScreen} options={{headerShown: false}} />
             </Stack.Navigator>
         </NavigationContainer>

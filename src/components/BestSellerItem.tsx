@@ -26,7 +26,15 @@ const styles = StyleSheet.create({
     },
     card: {
         borderRadius: 10,
-        padding: 0
+        padding: 0,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
     },
     image: {
         aspectRatio: 16/9,

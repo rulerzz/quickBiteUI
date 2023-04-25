@@ -24,7 +24,7 @@ export interface Item {
     createdAt:        string;
     updatedAt:        string;
     quantity:         number;
-    selectedConfig?:   object;
+    selectedConfig?:   Config;
 }
 
 export interface CategoriesAndItems {
@@ -42,3 +42,11 @@ export interface Config {
     name:         string;
     price:        number;
 }
+
+export interface CartItem {
+    item:           Item;
+    quantity:       number;
+    selectedConfig: Config;
+}
+
+

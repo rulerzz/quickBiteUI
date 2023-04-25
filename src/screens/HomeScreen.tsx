@@ -4,45 +4,26 @@ import BestSellerComponent from "../components/BestSellerComponent";
 import CategoryChooseComponent from "../components/CategoryChooseComponent";
 import ItemViewerComponent from "../components/ItemViewerComponent";
 import CartComponent from "../components/CartComponent";
-import React from "react";
+import React, {useState} from "react";
 import axios, {AxiosResponse} from 'axios';
-import {Category, Item} from "../models/Restraunt";
+import {CartItem, Category, Config, Item} from "../models/Restraunt";
 import {storage} from "./AppComponent";
 import {useFocusEffect, useIsFocused} from "@react-navigation/native";
-
-let data: any;
 
 const HomeScreen = ({ route, navigation }) => {
     const { url } = route.params;
     const isFocused = useIsFocused();
+    const [cart, setCart] = useState([]);
 
-    const addToCart = (item: Item, selectedConfig: any, quantity: number) => {
-        item.selectedConfig = selectedConfig;
-        item.quantity = quantity;
+    const addToCart = (item: Item, selectedConfig: Config, quantity: number) => {
+        console.log(selectedConfig)
         try{
-            let cart: Item[] = [];
-            let cartStored = storage.getString('cart');
-
-            if(cartStored === '[]'){
-                if(quantity > 0){
-                    cart.push(item);
-                    storage.set(
-                        'cart',
-                        JSON.stringify(cart),
-                    );
-                    console.log(cart)
-                }
-            }
-            else{
-                if(quantity > 0){
-                    cart.push(item);
-                    storage.set(
-                        'cart',
-                        JSON.stringify(cart),
-                    );
-                    console.log(cart)
-                }
-            }
+            let cartItem: CartItem = {
+                item: item,
+                quantity: quantity,
+                selectedConfig: selectedConfig
+            };
+            setCart( [...cart, cartItem]);
         }
         catch(e){
             console.log('error loading cart', e)
@@ -178,7 +159,7 @@ const HomeScreen = ({ route, navigation }) => {
                 <CategoryChooseComponent categories={categories} setActiveCategoryForHome={setActiveCategoryForHome} categorySelected={categorySelected}></CategoryChooseComponent>
                 <ItemViewerComponent categories={categories} setActiveItemForItemViewer={setActiveItemForItemViewer} categorySelected={categorySelected}></ItemViewerComponent>
             </ScrollView>
-            <CartComponent></CartComponent>
+            <CartComponent cart={cart} navigation={navigation} setCart={setCart}></CartComponent>
         </View>
     );
 };

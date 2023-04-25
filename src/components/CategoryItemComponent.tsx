@@ -20,14 +20,30 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         margin: 10,
-        borderRadius: 5
+        borderRadius: 5,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
     },
     buttonActive: {
         backgroundColor:'red',
         justifyContent: 'center',
         alignItems: 'center',
         margin: 10,
-        borderRadius: 5
+        borderRadius: 5,
+        shadowColor: 'rgba(37, 211, 102, 1)',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
     },
     heading:{
         color: 'black',
