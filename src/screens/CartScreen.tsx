@@ -14,7 +14,6 @@ import {storage} from "./AppComponent";
 import {CartItem, Item} from "../models/Restraunt";
 const CartScreen = (props) => {
     const [cart, setCart] = useState([]);
-    const event = new EventEmitter();
 
     useEffect(() => {
         setCart(props.route.params.cart);
