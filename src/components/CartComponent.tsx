@@ -16,16 +16,8 @@ const CartComponent = (props) => {
         setSum(localSum)
     }, [props.cart])
 
-    const carter = () => {
-        try{
-            props.navigation.navigate('cartScreen', {cart : props.cart})
-        }catch(e){
-            console.log("could not save cart to store")
-        }
-    }
-
     return (
-        <Button buttonStyle={styles.button} containerStyle={styles.buttonContainer} onPress={() => carter()}>
+        <Button buttonStyle={styles.button} containerStyle={styles.buttonContainer} onPress={() => props.setCartInStorageAndNavigateToCartScreen()}>
             <View style={styles.cartBox}>
                 <Icon type='font-awesome' name="opencart" color="white" style={styles.cartButton}/>
                 <View style={styles.cartItems}><Text style={{color: 'white'}}>{props.cart.length}</Text></View>

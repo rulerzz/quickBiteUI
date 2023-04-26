@@ -9,11 +9,13 @@ import axios, {AxiosResponse} from 'axios';
 import {CartItem, Category, Config, Item} from "../models/Restraunt";
 import {storage} from "./AppComponent";
 import {useFocusEffect, useIsFocused} from "@react-navigation/native";
+import {config} from "../config/config";
 
 const HomeScreen = ({ route, navigation }) => {
     const { url } = route.params;
     const isFocused = useIsFocused();
     const [cart, setCart] = useState([]);
+    const [orderType, setOrderType] = useState('pickup');
 
     const addToCart = (item: Item, selectedConfig: Config, quantity: number) => {
         console.log(selectedConfig)
@@ -129,7 +131,7 @@ const HomeScreen = ({ route, navigation }) => {
             navigation.navigate('qrScan', {message : 'Invalid qrCode'});
 
         return axios.get(
-            `http://192.168.29.60:4000/api/v1/users/menu/${explodedUrl[3]}`,
+            `${config.SERVER_BASE_URL}/api/v1/users/menu/${explodedUrl[3]}`,
             {
                 headers: {
                     Accept: 'application/json',
@@ -149,17 +151,32 @@ const HomeScreen = ({ route, navigation }) => {
         navigation.navigate('itemViewer', {item : item})
     };
 
+    const setCartInStorageAndNavigateToCartScreen = () =>{
+        try{
+            storage.set('cart', JSON.stringify(cart));
+            navigation.navigate('cartScreen', {cart : cart, updateCart: setCart});
+        }catch(e){
+            console.log("could not store cart and navigate to cart screen");
+        }
+    };
+
+    const placeOrder = () =>{
+      axios.post(config.SERVER_BASE_URL.concat("/api/v1/")).then((response) => {
+          console.log(response.data)
+      })
+    };
+
     return (
         <View style={styles.container}>
             <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }>
-                <OrderTypeComponent navigation={navigation}></OrderTypeComponent>
+                <OrderTypeComponent navigation={navigation} orderType={orderType} setOrderType={setOrderType}></OrderTypeComponent>
                 <BestSellerComponent bestSellers={bestSellers} setActiveItemForItemViewer={setActiveItemForItemViewer}></BestSellerComponent>
                 <CategoryChooseComponent categories={categories} setActiveCategoryForHome={setActiveCategoryForHome} categorySelected={categorySelected}></CategoryChooseComponent>
                 <ItemViewerComponent categories={categories} setActiveItemForItemViewer={setActiveItemForItemViewer} categorySelected={categorySelected}></ItemViewerComponent>
             </ScrollView>
-            <CartComponent cart={cart} navigation={navigation} setCart={setCart}></CartComponent>
+            <CartComponent cart={cart} navigation={navigation} setCartInStorageAndNavigateToCartScreen={setCartInStorageAndNavigateToCartScreen}></CartComponent>
         </View>
     );
 };

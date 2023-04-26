@@ -12,66 +12,84 @@ import {
 import {Button, Card, Icon, Image} from "@rneui/themed";
 import {storage} from "./AppComponent";
 import {CartItem, Item} from "../models/Restraunt";
+import Lottie from 'lottie-react-native';
+
 const CartScreen = (props) => {
-    const [cart, setCart] = useState([]);
+    const [localCart, setLocalCart] = useState([]);
+    const [sum, setSum] = useState(0.0);
 
     useEffect(() => {
-        setCart(props.route.params.cart);
+        setLocalCart(props.route.params.cart);
+        let localSum = 0;
+        props.route.params.cart.forEach(el => {
+            localSum += el.selectedConfig.price
+        })
+        setSum(localSum)
     }, [props.route.params.cart])
+
+
 
     const removeItemFromCart = (item: CartItem) => {
         try{
-            // let cart = props.route.params.cart.filter((e) => e.item._id != item.item._id);
-            // props.route.params.setCart(cart);
-            // setCart(cart);
+            let cart = localCart.filter((e) => e.item._id != item.item._id);
+            props.route.params.updateCart(cart);
+            setLocalCart(cart);
         }catch(e){
             console.log(e)
         }
     }
-
+    const listItems = localCart.map((item: CartItem, key) =>
+            <Card containerStyle={styles.card} wrapperStyle={styles.cardWrapper} key={key}>
+                <View style={styles.innerView1}>
+                    <Text style={styles.heading}>{item.item.name}</Text>
+                    <View style={{flexDirection: "row", paddingLeft: 20,}}>
+                        <Icon type="ionicon" name="fast-food-sharp" style={styles.icon}/>
+                        <Text style={styles.icontext}> {item.selectedConfig?.name}</Text>
+                    </View>
+                    <View style={{flexDirection: "row", paddingLeft: 20,}}>
+                        <Icon type="font-awesome-5" name="money-bill" style={styles.icon}/>
+                        <Text style={styles.icontext}>₹ {item.selectedConfig?.price}</Text>
+                    </View>
+                    <View style={{flexDirection: "row", paddingLeft: 20,}}>
+                        <Icon type="octicon" name="number" style={styles.icon}/>
+                        <Text style={styles.icontext}>{item.quantity}</Text>
+                    </View>
+                    <Button title="Remove" buttonStyle={styles.button} onPress={() => {removeItemFromCart(item)}}></Button>
+                </View>
+                <View style={styles.innerView2}>
+                    <Image
+                        style={styles.image}
+                        resizeMode="cover"
+                        containerStyle={styles.imageContainer}
+                        source={{ uri : item.item.image}}
+                        PlaceholderContent={<ActivityIndicator />}
+                    />
+                </View>
+            </Card>
+    );
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.heading2}>These are your cart items</Text>
+            {
+                listItems.length > 0 ? <Text style={styles.heading2}>These are your cart items</Text> : <Text style={styles.heading2}>Cart doesn't seem to have anything meow~</Text>
+            }
             <ScrollView style={styles.scrollView}>
                 <View style={styles.view}>
                     {
-                        cart.map((item: CartItem, key) => {
-                            return <Card containerStyle={styles.card} wrapperStyle={styles.cardWrapper} key={key}>
-                                <View style={styles.innerView1}>
-                                    <Text style={styles.heading}>{item.item.name}</Text>
-                                    <View style={{flexDirection: "row", paddingLeft: 20,}}>
-                                        <Icon type="ionicon" name="fast-food-sharp" style={styles.icon}/>
-                                        <Text style={styles.icontext}> {item.selectedConfig?.name}</Text>
-                                    </View>
-                                    <View style={{flexDirection: "row", paddingLeft: 20,}}>
-                                        <Icon type="font-awesome-5" name="money-bill" style={styles.icon}/>
-                                        <Text style={styles.icontext}>₹ {item.selectedConfig?.price}</Text>
-                                    </View>
-                                    <View style={{flexDirection: "row", paddingLeft: 20,}}>
-                                        <Icon type="octicon" name="number" style={styles.icon}/>
-                                        <Text style={styles.icontext}>{item.quantity}</Text>
-                                    </View>
-                                    <Button title="Remove" buttonStyle={styles.button} onPress={() => {removeItemFromCart(item)}}></Button>
-                                </View>
-                                <View style={styles.innerView2}>
-                                    <Image
-                                        style={styles.image}
-                                        resizeMode="cover"
-                                        containerStyle={styles.imageContainer}
-                                        source={{ uri : item.item.image}}
-                                        PlaceholderContent={<ActivityIndicator />}
-                                    />
-                                </View>
-                            </Card>
-                        })
+                        listItems.length > 0 ? listItems : <Lottie style={{height: '100%', width: '100%'}} source={require('../assets/json/11646-no-activity-animation.json')} autoPlay loop />
                     }
                 </View>
             </ScrollView>
             <View>
-                <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => {}}>
+                {
+                    listItems.length > 0 ?                 <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => {props.navigation.navigate('orderScreen', {cart: localCart})}}>
                         <Icon type='evil-icon' name="check" color="white"/>
-                        <Text style={styles.conText}>Place Order</Text>
-                </Button>
+                        <Text style={styles.conText}>Continue Order for INR {sum}</Text>
+                    </Button> :                 <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => {props.navigation.navigate('home', {})}}>
+                        <Icon type='ionicon' name="arrow-back" color="white"/>
+                        <Text style={styles.conText}>Go Back</Text>
+                    </Button>
+                }
+
             </View>
         </SafeAreaView>
     );

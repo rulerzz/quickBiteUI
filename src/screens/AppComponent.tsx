@@ -12,6 +12,10 @@ const Stack = createNativeStackNavigator();
 import { MMKV } from 'react-native-mmkv';
 import ItemViewerScreen from "./ItemViewerScreen";
 import CartScreen from "./CartScreen";
+import OrderScreen from "./OrderScreen";
+import LoginScreen from "./LoginScreen";
+import RegisterScreen from "./RegisterScreen";
+import ResetPasswordScreen from "./ResetPasswordScreen";
 
 const AppComponent = () => {
     return (
@@ -21,23 +25,22 @@ const AppComponent = () => {
                     header: ({ navigation, route, options, back }) => {
                         const title = getHeaderTitle(options, route.name);
                         return (
-                            <HeaderComponent/>
+                            <HeaderComponent navigation={navigation}/>
                         );
                     },
                     gestureDirection: "horizontal"
                 }}/>
                 <Stack.Screen name="pickupDelivery" component={PickupDeliveryScreen} options={{}}/>
-                <Stack.Screen name="itemViewer" component={ItemViewerScreen} options={{
-                    header: ({ navigation, route, options, back }) => {
-                        const title = getHeaderTitle(options, route.name);
-                        return (
-                            <HeaderComponent/>
-                        );
-                    },
-                    gestureDirection: "horizontal"}}/>
+                <Stack.Screen name="itemViewer" component={ItemViewerScreen} options={{headerShown: false}}/>
                 <Stack.Screen name="cartScreen" component={CartScreen} options={{
                     title : "cart"
                 }}/>
+                <Stack.Screen name="orderScreen" component={OrderScreen} options={{
+                    title : "order"
+                }}/>
+                <Stack.Screen name="login" component={LoginScreen} options={{headerShown: false}}/>
+                <Stack.Screen name="register" component={RegisterScreen} options={{headerShown: false}}/>
+                <Stack.Screen name="forgot" component={ResetPasswordScreen} options={{headerShown: false}}/>
                 <Stack.Screen name="qrScan" component={QrScanScreen} options={{headerShown: false}} />
             </Stack.Navigator>
         </NavigationContainer>
