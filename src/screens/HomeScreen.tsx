@@ -42,7 +42,7 @@ const HomeScreen = ({ route, navigation }) => {
         console.log(`refreshed`)
         setRefreshing(true);
         try {
-            loadData(storage.getString('url')).then((response: AxiosResponse) => processData(response));
+            loadData(storage.getString('url')).then((response: AxiosResponse) => processData(response)).catch(e => console.log(e));
         } catch (error) {
             console.log(`error loading urldata while refreshing`)
         }
@@ -74,7 +74,7 @@ const HomeScreen = ({ route, navigation }) => {
                 navigation.navigate('qrScan', {message : 'QR Code does not match our system'});
             }
 
-            loadData(storage.getString('url')).then((response: AxiosResponse) => processData(response));
+            loadData(storage.getString('url')).then((response: AxiosResponse) => processData(response)).catch(e => console.log(e));
         } catch (error) {
             console.log(`error saving cart in use effect with url ${url}`)
         }
