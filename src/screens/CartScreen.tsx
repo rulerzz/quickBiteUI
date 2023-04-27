@@ -6,7 +6,7 @@ import {
     ScrollView,
     StatusBar,
     StyleSheet,
-    Text,
+    Text, ToastAndroid,
     View
 } from "react-native";
 import {Button, Card, Icon, Image} from "@rneui/themed";
@@ -17,6 +17,10 @@ import Lottie from 'lottie-react-native';
 const CartScreen = (props) => {
     const [localCart, setLocalCart] = useState([]);
     const [sum, setSum] = useState(0.0);
+
+    const showToast = (message: string) => {
+        ToastAndroid.show(message, ToastAndroid.SHORT);
+    };
 
     useEffect(() => {
         setLocalCart(props.route.params.cart);
@@ -34,6 +38,7 @@ const CartScreen = (props) => {
             let cart = localCart.filter((e) => e.item._id != item.item._id);
             props.route.params.updateCart(cart);
             setLocalCart(cart);
+            showToast(`Removed ${item.item.name} from cart`)
         }catch(e){
             console.log(e)
         }
@@ -81,7 +86,7 @@ const CartScreen = (props) => {
             </ScrollView>
             <View>
                 {
-                    listItems.length > 0 ?                 <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => {props.navigation.navigate('orderScreen', {cart: localCart})}}>
+                    listItems.length > 0 ?                 <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => {props.navigation.navigate('orderScreen', {cart: localCart, navigation: props.navigation})}}>
                         <Icon type='evil-icon' name="check" color="white"/>
                         <Text style={styles.conText}>Continue Order for INR {sum}</Text>
                     </Button> :                 <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => {props.navigation.navigate('home', {})}}>

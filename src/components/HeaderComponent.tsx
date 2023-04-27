@@ -1,18 +1,40 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, ActivityIndicator, ImageBackground} from 'react-native';
 import {Button, Icon, Image} from "@rneui/themed";
+import {storage} from "../screens/AppComponent";
+import {User} from "../models/Restraunt";
 
 const HeaderComponent = ({navigation}) => {
+    const [isLoggedIN, setIsLoggedIN] = useState(false);
+    const [user, setUser] = useState<User>(null);
+
+    useEffect(() => {
+        try{
+            let token = storage.getString('token')
+            let userx: User = JSON.parse(storage.getString('user')!)[0]
+            if(token){
+                setIsLoggedIN(true)
+                setUser(userx)
+            }
+            else{
+                setIsLoggedIN(false)
+                setUser(null)
+            }
+        }catch(e){
+            console.log("error reading storage")
+        }
+    }, [])
     return (
         <View style={styles.view}>
             <View style={styles.leftView}>
             {/*<Button type="outline" style={styles.hamburgerButton} buttonStyle={{ borderRadius : 60, borderWidth: 1, marginRight: 10 }}>*/}
             {/*    <Icon name="menu" />*/}
-            {/*</Button>*/}
-            <Button type="solid" style={styles.loginButton}  buttonStyle={{ backgroundColor: 'rgba(37, 211, 102, 1)', borderRadius: 8 }} onPress={() => {navigation.navigate('login', {})}}>
-                <Icon name="logo-whatsapp" type='ionicon' color="white" />
-                <Text style={{color: "white"}}>  LOGIN</Text>
-            </Button>
+            {/*</Button>*/}{
+                !isLoggedIN ?             <Button type="solid" style={styles.loginButton}  buttonStyle={{ backgroundColor: 'rgba(37, 211, 102, 1)', borderRadius: 8 }} onPress={() => {navigation.navigate('login', {})}}>
+                    <Icon name="logo-whatsapp" type='ionicon' color="white" />
+                    <Text style={{color: "white"}}>  LOGIN</Text>
+                </Button> : <View style={{flexDirection: "column"}}><Text style={{color: 'black', fontWeight: "bold", fontSize: 20 }}>Hi! {user?.firstName} {user?.lastName}</Text><Text>{user?.email}</Text></View>
+            }
             </View>
             <Image source={require('../assets/images/logo.png' )} style={styles.image} PlaceholderContent={<ActivityIndicator />}>
             </Image>
@@ -24,7 +46,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: "space-between",
-        width: 140,
+        width: 180,
         padding: 0,
         margin: 0
     },

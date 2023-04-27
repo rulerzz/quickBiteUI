@@ -21,10 +21,12 @@ const OrderScreen = (props) => {
     const [deliveryTime, setDeliveryTime] = useState('25 - 30 mins');
     const [paymentType, setPaymentType] = useState('cash');
     const [sum, setSum] = useState(0.0);
+    const [rInfo, setRinfo] = useState(null);
 
     useEffect(() => {
         try{
             setOrderType(storage.getString('orderType')!)
+            setRinfo(JSON.parse(storage.getString('rinfo')!))
         }catch(e){
             console.log("error getting orderType from storage")
         }
@@ -61,9 +63,9 @@ const OrderScreen = (props) => {
       return <View style={styles.iconic}>
           <View style={{flexDirection: "row", padding: 5}}>
               <Icon type='entypo' name="location-pin" color="gray"/>
-              <Text style={{marginLeft: 10, textTransform: "capitalize"}}>{addr}</Text>
+              <Text style={{marginLeft: 10, textTransform: "capitalize"}}>{rInfo?.address1},{rInfo?.address2} {rInfo?.city} {rInfo?.state}</Text>
           </View>
-          <Icon type='entypo' name="edit" color="gray"/>
+          {/*<Icon type='entypo' name="edit" color="gray"/>*/}
       </View>
     };
 
@@ -73,7 +75,7 @@ const OrderScreen = (props) => {
                 <Icon type='font-awesome-5' name="clock" color="gray" style={{fontSize: 8}}/>
                 <Text style={{marginLeft: 10, textTransform: "capitalize"}}>{deliveryTime}</Text>
             </View>
-            <Icon type='entypo' name="edit" color="gray"/>
+            {/*<Icon type='entypo' name="edit" color="gray"/>*/}
         </View>
     };
 
@@ -83,7 +85,7 @@ const OrderScreen = (props) => {
                 <Icon type='material-icon' name="payments" color="gray" style={{fontSize: 8}}/>
                 <Text style={{marginLeft: 10, textTransform: "capitalize"}}>{paymentType}</Text>
             </View>
-            <Icon type='entypo' name="edit" color="gray"/>
+            {/*<Icon type='entypo' name="edit" color="gray"/>*/}
         </View>
     };
 
@@ -92,6 +94,19 @@ const OrderScreen = (props) => {
             <Text style={{ color: "#000",fontSize: 24,fontWeight: "bold",textTransform: "capitalize"}}>Total</Text>
             <Text style={{ color: "#000",fontSize: 24,fontWeight: "bold",textTransform: "uppercase"}}>INR {sum}</Text>
         </View>
+    };
+
+    const placeOrder = () => {
+        try{
+            const token = storage.getString("token")
+            if(!token){
+                props.route.params.navigation.navigate('login', {fromOrder: true});
+            }else{
+                //user logged in
+            }
+        }catch(e){
+            console.log("cannot proceed with place order as some error came")
+        }
     };
 
     return (
@@ -105,9 +120,6 @@ const OrderScreen = (props) => {
                     getAddr()
                 }
                 {
-                    getDeliveryTime()
-                }
-                {
                     getPaymentType()
                 }
                 {
@@ -115,7 +127,7 @@ const OrderScreen = (props) => {
                 }
             </View>
             <View>
-                <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => {}}>
+                <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => {placeOrder()}}>
                     <Icon type='evil-icon' name="check" color="white"/>
                     <Text style={styles.conText}>Place Order</Text>
                 </Button>

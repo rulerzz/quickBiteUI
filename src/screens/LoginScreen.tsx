@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { TouchableOpacity, StyleSheet, View } from 'react-native'
+import React, {useEffect, useState} from 'react'
+import {TouchableOpacity, StyleSheet, View, ToastAndroid} from 'react-native'
 import { Text } from 'react-native-paper'
 import Background from '../components/Background'
 import Logo from '../components/Logo'
@@ -11,11 +11,22 @@ import { theme } from '../core/theme'
 import { emailValidator } from '../helpers/emailValidator'
 import { passwordValidator } from '../helpers/passwordValidator'
 import Lottie from 'lottie-react-native';
+import axios from "axios";
+import {config} from "../config/config";
+import {storage} from "./AppComponent";
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen({ route, navigation }) {
+    const [fromOrder, setFromOrder] = useState(false)
     const [email, setEmail] = useState({ value: '', error: '' })
     const [password, setPassword] = useState({ value: '', error: '' })
 
+    const showToast = (message: string) => {
+        ToastAndroid.show(message, ToastAndroid.SHORT);
+    };
+
+    useEffect(() => {
+        setFromOrder(route.params.fromOrder);
+    }, [])
     const onLoginPressed = () => {
         const emailError = emailValidator(email.value)
         const passwordError = passwordValidator(password.value)
@@ -24,6 +35,29 @@ export default function LoginScreen({ navigation }) {
             setPassword({ ...password, error: passwordError })
             return
         }
+        axios.post(`${config.SERVER_BASE_URL}/api/v1/userlogin`, {
+            user: email.value,
+            password: password.value
+        }, {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }).then(response => {
+            //success
+            try{
+                storage.set("token", response.data.token)
+                storage.set("user", JSON.stringify(response.data.user))
+                if(fromOrder)
+                    navigation.goBack();
+                else
+                navigation.navigate('home', {})
+            }catch(e){
+                console.log("error saving JWT token")
+            }
+        }).catch(error => {
+            showToast("Incorrect user credentials")
+        })
     }
 
     return (

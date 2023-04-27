@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import {View, StyleSheet, TouchableOpacity, ToastAndroid} from 'react-native'
 import { Text } from 'react-native-paper'
 import Background from '../components/Background'
 import Logo from '../components/Logo'
@@ -11,26 +11,54 @@ import { theme } from '../core/theme'
 import { emailValidator } from '../helpers/emailValidator'
 import { passwordValidator } from '../helpers/passwordValidator'
 import { nameValidator } from '../helpers/nameValidator'
+import axios from "axios";
+import {config} from "../config/config";
+import {storage} from "./AppComponent";
 
 export default function RegisterScreen({ navigation }) {
-  const [name, setName] = useState({ value: '', error: '' })
-  const [email, setEmail] = useState({ value: '', error: '' })
-  const [password, setPassword] = useState({ value: '', error: '' })
+  const [fname, setFName] = useState({ value: '', error: '' });
+  const [lname, setLName] = useState({ value: '', error: '' });
+  const [email, setEmail] = useState({ value: '', error: '' });
+  const [password, setPassword] = useState({ value: '', error: '' });
+
+  const showToast = (message: string) => {
+      ToastAndroid.show(message, ToastAndroid.SHORT);
+  };
 
   const onSignUpPressed = () => {
-    const nameError = nameValidator(name.value)
+    const fnameError = nameValidator(fname.value)
+    const lnameError = nameValidator(lname.value)
     const emailError = emailValidator(email.value)
     const passwordError = passwordValidator(password.value)
-    if (emailError || passwordError || nameError) {
-      setName({ ...name, error: nameError })
+    if (emailError || passwordError || fnameError || lnameError) {
+      setFName({ ...fname, error: fnameError })
+      setLName({ ...lname, error: lnameError })
       setEmail({ ...email, error: emailError })
       setPassword({ ...password, error: passwordError })
       return
     }
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Dashboard' }],
-    })
+      axios.post(`${config.SERVER_BASE_URL}/api/v1/userregister`, {
+          firstName: fname.value,
+          lastName: lname.value,
+          email: email.value,
+          password: password.value,
+          ownerType: 'registered'
+      }, {
+          headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+          }
+      }).then(response => {
+          //success
+          try{
+              showToast("Account created, please login.")
+              navigation.navigate('login')
+          }catch(e){
+              console.log("error saving JWT token")
+          }
+      }).catch(error => {
+          showToast("Incorrect user credentials")
+      })
   }
 
   return (
@@ -38,13 +66,21 @@ export default function RegisterScreen({ navigation }) {
       <Logo />
       <Header>Create Account</Header>
       <TextInput
-        label="Name"
+        label="Firstname"
         returnKeyType="next"
-        value={name.value}
-        onChangeText={(text) => setName({ value: text, error: '' })}
-        error={!!name.error}
-        errorText={name.error}
+        value={fname.value}
+        onChangeText={(text) => setFName({ value: text, error: '' })}
+        error={!!fname.error}
+        errorText={fname.error}
       />
+        <TextInput
+            label="Lastname"
+            returnKeyType="next"
+            value={lname.value}
+            onChangeText={(text) => setLName({ value: text, error: '' })}
+            error={!!lname.error}
+            errorText={lname.error}
+        />
       <TextInput
         label="Email"
         returnKeyType="next"
@@ -75,7 +111,7 @@ export default function RegisterScreen({ navigation }) {
       </Button>
       <View style={styles.row}>
         <Text>Already have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.replace('LoginScreen')}>
+        <TouchableOpacity onPress={() => navigation.replace('login')}>
           <Text style={styles.link}>Login</Text>
         </TouchableOpacity>
       </View>

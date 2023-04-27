@@ -49,4 +49,12 @@ export interface CartItem {
     selectedConfig: Config;
 }
 
+export interface  User{
+    firstName: string;
+    lastName: string;
+    email: string;
+    ownerType: string;
+    password?: string;
+}
+
 

@@ -1,4 +1,14 @@
-import {ActivityIndicator, Alert, Modal, RefreshControl, ScrollView, StyleSheet, Text, View} from "react-native";
+import {
+    ActivityIndicator,
+    Alert,
+    Modal,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    ToastAndroid,
+    View
+} from "react-native";
 import OrderTypeComponent from "../components/OrderTypeComponent";
 import BestSellerComponent from "../components/BestSellerComponent";
 import CategoryChooseComponent from "../components/CategoryChooseComponent";
@@ -17,6 +27,10 @@ const HomeScreen = ({ route, navigation }) => {
     const [cart, setCart] = useState([]);
     const [orderType, setOrderType] = useState('pickup');
 
+    const showToast = (message: string) => {
+        ToastAndroid.show(message, ToastAndroid.SHORT);
+    };
+
     const addToCart = (item: Item, selectedConfig: Config, quantity: number) => {
         console.log(selectedConfig)
         try{
@@ -26,6 +40,7 @@ const HomeScreen = ({ route, navigation }) => {
                 selectedConfig: selectedConfig
             };
             setCart( [...cart, cartItem]);
+            showToast(`Added ${cartItem.item.name} to cart`);
         }
         catch(e){
             console.log('error loading cart', e)
@@ -59,6 +74,31 @@ const HomeScreen = ({ route, navigation }) => {
         });
         setCategories(categories);
         setBestSellers(filteredItems);
+        loadRestrauntInfo();
+    };
+
+    const loadRestrauntInfo = () => {
+        try{
+            let urlForLoad = storage.getString('url')!;
+            const explodedUrl = urlForLoad.split('/');
+            axios.get(
+                `${config.SERVER_BASE_URL}/api/v1/users/${explodedUrl[3]}`,
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    }
+                }).then((response) => {
+                try{
+                    console.log("RINFO GET")
+                    storage.set('rinfo', JSON.stringify(response.data.user))
+                }catch(e){
+                    console.log("Error storing restraunt info to storage")
+                }
+            }).catch((err) => console.log(err));
+        }catch(e){
+            console.log("error getiing url from storage in loadrinfo")
+        }
     };
 
     React.useEffect(() => {
@@ -69,7 +109,10 @@ const HomeScreen = ({ route, navigation }) => {
                 'url',
                 url,
             );
-
+            storage.set(
+                'orderType',
+                'pickup',
+            );
             if(!url.includes("quickBite.com")){
                 navigation.navigate('qrScan', {message : 'QR Code does not match our system'});
             }
@@ -158,12 +201,6 @@ const HomeScreen = ({ route, navigation }) => {
         }catch(e){
             console.log("could not store cart and navigate to cart screen");
         }
-    };
-
-    const placeOrder = () =>{
-      axios.post(config.SERVER_BASE_URL.concat("/api/v1/")).then((response) => {
-          console.log(response.data)
-      })
     };
 
     return (

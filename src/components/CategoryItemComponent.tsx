@@ -1,16 +1,27 @@
 import {Button, Card, Image} from "@rneui/themed";
-import {StyleSheet, Text, View} from "react-native";
+import {StyleSheet, Text, ToastAndroid, View} from "react-native";
 import React from "react";
 
 const CategoryItemComponent = (props) => {
+
+    const showToast = (message: string) => {
+        ToastAndroid.show(message, ToastAndroid.SHORT);
+    };
+
     if(props.categorySelected === props.item.name)
         return (
-            <Button size="md" color="rgba(37, 211, 102, 1)" containerStyle={styles.buttonActive} title={props.item.name} onPress={() => {props.sendDataToParent(props.item.name)}}>
+            <Button size="md" color="rgba(37, 211, 102, 1)" containerStyle={styles.buttonActive} title={props.item.name} onPress={() => {
+                props.sendDataToParent(props.item.name)
+                showToast(`Showing dishes with category ${props.item.name}`)
+            }}>
             </Button>
         );
     else
         return (
-            <Button size="md" containerStyle={styles.button} title={props.item.name} onPress={() => {props.sendDataToParent(props.item.name)}}>
+            <Button size="md" containerStyle={styles.button} title={props.item.name} onPress={() => {
+                props.sendDataToParent(props.item.name)
+                showToast(`Showing dishes with category ${props.item.name}`)
+            }}>
             </Button>
         );
 };
