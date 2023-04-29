@@ -14,7 +14,7 @@ import {storage} from "./AppComponent";
 import {CartItem, Item} from "../models/Restraunt";
 import Lottie from 'lottie-react-native';
 
-const CartScreen = (props) => {
+const CartScreen = ({ route, navigation}) => {
     const [localCart, setLocalCart] = useState([]);
     const [sum, setSum] = useState(0.0);
 
@@ -23,20 +23,20 @@ const CartScreen = (props) => {
     };
 
     useEffect(() => {
-        setLocalCart(props.route.params.cart);
+        setLocalCart(route.params.cart);
         let localSum = 0;
-        props.route.params.cart.forEach(el => {
-            localSum += el.selectedConfig.price
+        route.params.cart.forEach(el => {
+            localSum += el.selectedConfig.price * el.quantity
         })
         setSum(localSum)
-    }, [props.route.params.cart])
+    }, [route.params.cart])
 
 
 
     const removeItemFromCart = (item: CartItem) => {
         try{
             let cart = localCart.filter((e) => e.item._id != item.item._id);
-            props.route.params.updateCart(cart);
+            route.params.updateCart(cart);
             setLocalCart(cart);
             showToast(`Removed ${item.item.name} from cart`)
         }catch(e){
@@ -86,13 +86,15 @@ const CartScreen = (props) => {
             </ScrollView>
             <View>
                 {
-                    listItems.length > 0 ?                 <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => {props.navigation.navigate('orderScreen', {cart: localCart, navigation: props.navigation})}}>
-                        <Icon type='evil-icon' name="check" color="white"/>
-                        <Text style={styles.conText}>Continue Order for INR {sum}</Text>
-                    </Button> :                 <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => {props.navigation.navigate('home', {})}}>
-                        <Icon type='ionicon' name="arrow-back" color="white"/>
-                        <Text style={styles.conText}>Go Back</Text>
-                    </Button>
+                    listItems.length > 0 ?
+                        <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => route.params.gotToOrderScreen()}>
+                            <Icon type='evil-icon' name="check" color="white"/>
+                            <Text style={styles.conText}>Continue Order for INR {sum}</Text>
+                        </Button> :
+                        <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => {navigation.navigate('home', {})}}>
+                            <Icon type='ionicon' name="arrow-back" color="white"/>
+                            <Text style={styles.conText}>Go Back</Text>
+                        </Button>
                 }
 
             </View>

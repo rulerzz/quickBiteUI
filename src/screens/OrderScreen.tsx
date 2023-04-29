@@ -11,33 +11,45 @@ import {
 } from "react-native";
 import {Button, Card, Icon, Image} from "@rneui/themed";
 import {storage} from "./AppComponent";
-import {CartItem, Item} from "../models/Restraunt";
+import {CartItem, Item, RestrauntUser, User} from "../models/Restraunt";
 import Lottie from 'lottie-react-native';
+import axios from "axios";
+import {config} from "../config/config";
 
-const OrderScreen = (props) => {
+const OrderScreen = ({route, navigation}) => {
 
     const [addr, setAddr] = useState('Park Avenue');
     const [orderType, setOrderType] = useState('Dine - In');
     const [deliveryTime, setDeliveryTime] = useState('25 - 30 mins');
     const [paymentType, setPaymentType] = useState('cash');
     const [sum, setSum] = useState(0.0);
-    const [rInfo, setRinfo] = useState(null);
-
+    const [rInfo, setRinfo] = useState<RestrauntUser>(null);
+    const [user, setUser] = useState(null);
     useEffect(() => {
         try{
-            setOrderType(storage.getString('orderType')!)
-            setRinfo(JSON.parse(storage.getString('rinfo')!))
+            if(storage.getString('orderType'))
+                setOrderType(storage.getString('orderType')!)
+            else
+                setOrderType(null)
+            if(storage.getString('user'))
+                setUser(JSON.parse(storage.getString('user')!))
+            else
+                setUser(null)
+            if(storage.getString('rinfo'))
+                setRinfo(JSON.parse(storage.getString('rinfo')!))
+            else
+                setRinfo(null)
         }catch(e){
             console.log("error getting orderType from storage")
         }
         let localSum = 0;
-        props.route.params.cart.forEach(el => {
-            localSum += el.selectedConfig.price
+        route.params.cart.forEach(el => {
+            localSum += el.selectedConfig.price * el.quantity
         })
         setSum(localSum)
-    }, [props.route.params.cart])
+    }, [route.params.cart])
 
-    const listItems = props.route.params.cart.map((item: CartItem, key) =>
+    const listItems = route.params.cart.map((item: CartItem, key) =>
         <View style={styles.card} key={key}>
             <View style={styles.innerView1}>
                 <Text style={styles.heading}>{item.item.name}</Text>
@@ -96,16 +108,59 @@ const OrderScreen = (props) => {
         </View>
     };
 
+    const getOrderType = () =>{
+        switch (orderType){
+            case 'pickup':
+                return 'Take Home';
+                break;
+            case 'delivery':
+                return 'Delivery';
+                break;
+            case 'dinein':
+                return 'Dine In';
+                break;
+        }
+    };
+
+
     const placeOrder = () => {
         try{
             const token = storage.getString("token")
             if(!token){
-                props.route.params.navigation.navigate('login', {fromOrder: true});
+                navigation.navigate('login', {fromOrder: true});
             }else{
-                //user logged in
+                // populate request object
+                //user logged in call place order and navigate to order status
+                    axios.post(`${config.SERVER_BASE_URL}/api/v1/customer-order/createorder`, {
+                        orderType: getOrderType(),
+                        status: "Placed",
+                        price: sum,
+                        user: rInfo._id,
+                        items: route.params.cart,
+                        placed_time: new Date(),
+                        address: `${rInfo?.address1},${rInfo?.address2} ${rInfo?.city} ${rInfo?.state}`,
+                        userId : user?._id
+                    }, {
+                        headers: {
+                            Accept: 'application/json',
+                            'Content-Type': 'application/json',
+                        }
+                    }).then((response) => {
+                        // console.log(response.data.data._id)
+                        // success take to order status page
+                        try{
+                            storage.delete("cart");
+                            route.params.refreshCart();
+                            route.params.gotToOrderStatusScreen(response.data.data._id);
+                        }
+                        catch(e){
+                            console.log("Error clearing cart")
+                        }
+
+                    }).catch((error) => console.log(error))
             }
         }catch(e){
-            console.log("cannot proceed with place order as some error came")
+            console.log("cannot proceed with place order as some error came", e)
         }
     };
 

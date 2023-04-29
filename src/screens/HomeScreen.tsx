@@ -20,6 +20,7 @@ import {CartItem, Category, Config, Item} from "../models/Restraunt";
 import {storage} from "./AppComponent";
 import {useFocusEffect, useIsFocused} from "@react-navigation/native";
 import {config} from "../config/config";
+import { StackActions } from '@react-navigation/native';
 
 const HomeScreen = ({ route, navigation }) => {
     const { url } = route.params;
@@ -33,18 +34,32 @@ const HomeScreen = ({ route, navigation }) => {
 
     const addToCart = (item: Item, selectedConfig: Config, quantity: number) => {
         console.log(selectedConfig)
-        try{
-            let cartItem: CartItem = {
-                item: item,
-                quantity: quantity,
-                selectedConfig: selectedConfig
-            };
-            setCart( [...cart, cartItem]);
-            showToast(`Added ${cartItem.item.name} to cart`);
-        }
-        catch(e){
-            console.log('error loading cart', e)
-        }
+        if(selectedConfig)
+            try{
+                let cartItem: CartItem = {
+                    item: item,
+                    quantity: quantity,
+                    selectedConfig: selectedConfig
+                };
+                setCart( [...cart, cartItem]);
+                showToast(`Added ${cartItem.item.name} to cart`);
+            }
+            catch(e){
+                console.log('error loading cart', e)
+            }
+        else
+            try{
+                let cartItem: CartItem = {
+                    item: item,
+                    quantity: quantity,
+                    selectedConfig: { _id: 0, price: item.price, name: 'default'}
+                };
+                setCart( [...cart, cartItem]);
+                showToast(`Added ${cartItem.item.name} to cart`);
+            }
+            catch(e){
+                console.log('error loading cart', e)
+            }
     };
 
     const [bestSellers, setBestSellers] = React.useState<Item[]>([]);
@@ -68,6 +83,7 @@ const HomeScreen = ({ route, navigation }) => {
         setRefreshing(false);
         let filteredItems: Item[] = [];
         let categories: Category[] = [];
+        console.log(response.data.categories )
         response.data.categories.forEach((category: Category) => {
             category.items.forEach((item: Item) => { item.quantity = 1; if(item.bestselling) filteredItems.push(item) });
             categories.push(category);
@@ -169,7 +185,7 @@ const HomeScreen = ({ route, navigation }) => {
     const loadData = (urlForLoad: any) => {
         console.log("load data ", urlForLoad)
         const explodedUrl = urlForLoad.split('/');
-
+        console.log("exploded url" , explodedUrl)
         if(!explodedUrl[3])
             navigation.navigate('qrScan', {message : 'Invalid qrCode'});
 
@@ -197,11 +213,39 @@ const HomeScreen = ({ route, navigation }) => {
     const setCartInStorageAndNavigateToCartScreen = () =>{
         try{
             storage.set('cart', JSON.stringify(cart));
-            navigation.navigate('cartScreen', {cart : cart, updateCart: setCart});
+            navigation.navigate('cartScreen', {cart : cart, updateCart: setCart, gotToOrderScreen: gotToOrderScreen});
         }catch(e){
             console.log("could not store cart and navigate to cart screen");
         }
     };
+
+    const gotToOrderScreen = () =>{
+        try{
+            const popAction = StackActions.pop(1);
+            navigation.dispatch(popAction);
+            navigation.navigate('orderScreen', {cart : cart, updateCart: setCart, gotToOrderStatusScreen: gotToOrderStatusScreen, refreshCart: refreshCart});
+        }catch(e){
+            console.log("could not navigate to order screen");
+        }
+    };
+
+    const gotToOrderStatusScreen = (id: any) =>{
+        try{
+            const popAction = StackActions.pop(1);
+            navigation.dispatch(popAction);
+            navigation.navigate('orderStatus', {orderId: id, refreshApp: refreshApp});
+        }catch(e){
+            console.log("could not navigate to order screen");
+        }
+    };
+
+    const refreshApp = (action: any) => {
+        navigation.dispatch(action);
+    }
+
+    const refreshCart = () => {
+        setCart([]);
+    }
 
     return (
         <View style={styles.container}>

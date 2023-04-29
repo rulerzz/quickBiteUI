@@ -52,7 +52,7 @@ export default function RegisterScreen({ navigation }) {
           //success
           try{
               showToast("Account created, please login.")
-              navigation.navigate('login')
+              navigation.navigate('login', { fromLogin : false})
           }catch(e){
               console.log("error saving JWT token")
           }

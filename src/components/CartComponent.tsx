@@ -11,7 +11,7 @@ const CartComponent = (props) => {
     useEffect(() => {
         let localSum = 0;
         props.cart.forEach(el => {
-            localSum += el.selectedConfig.price
+            localSum += el.selectedConfig.price * el.quantity
         })
         setSum(localSum)
     }, [props.cart])

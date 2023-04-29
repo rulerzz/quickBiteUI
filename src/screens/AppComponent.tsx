@@ -16,6 +16,7 @@ import OrderScreen from "./OrderScreen";
 import LoginScreen from "./LoginScreen";
 import RegisterScreen from "./RegisterScreen";
 import ResetPasswordScreen from "./ResetPasswordScreen";
+import OrderStatus from "./OrderStatus";
 
 const AppComponent = () => {
     return (
@@ -42,6 +43,9 @@ const AppComponent = () => {
                 <Stack.Screen name="register" component={RegisterScreen} options={{headerShown: false}}/>
                 <Stack.Screen name="forgot" component={ResetPasswordScreen} options={{headerShown: false}}/>
                 <Stack.Screen name="qrScan" component={QrScanScreen} options={{headerShown: false}} />
+                <Stack.Screen name="orderStatus" component={OrderStatus} options={{
+                    title : "order status"
+                }} />
             </Stack.Navigator>
         </NavigationContainer>
 

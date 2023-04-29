@@ -14,6 +14,8 @@ const onRedirect = (message: string) => {
 
 const QrScanScreen = ({ route, navigation }) => {
     React.useEffect(() => {
+        // Uncomment this line if running in android emulator comment if running on phone
+        navigation.navigate('home', { url : `http://www.quickBite.com/6415f8c5eaa19250bc8e3b0c`})
         const unsubscribe = navigation.addListener('focus', () => {
             // The screen is focused
             // Call any action

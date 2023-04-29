@@ -57,4 +57,36 @@ export interface  User{
     password?: string;
 }
 
+export interface RestrauntUser{
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    categories: Category[];
+    companyName: string;
+    country: string;
+    address1: string;
+    address2: string;
+    city: string;
+    state: string;
+    zip: string;
+    mobileNumber: string;
+    role: string;
+    ownerType: string;
+    createdAt: string;
+}
 
+export interface Order{
+
+    _id: string;
+    items: CartItem[];
+    orderType: string;
+    status: string;
+    price: string;
+    user: string;
+    placed_time: string;
+    address: string;
+    createdAt: string;
+    updatedAt: string;
+
+}
