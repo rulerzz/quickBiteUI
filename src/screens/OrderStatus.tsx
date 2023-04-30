@@ -149,7 +149,7 @@ const OrderStatus = ({ route, navigation }) => {
                 }
             </View>
             <View>
-                <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => {}}>
+                <Button buttonStyle={styles.buttonLarge} containerStyle={styles.buttonContainer} onPress={() => {navigation.navigate('home', {})}}>
                     <Icon type='ionicon' name="arrow-back" color="white"/>
                     <Text style={styles.conText}>New Order</Text>
                 </Button>

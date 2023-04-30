@@ -6,7 +6,7 @@ import {
     ScrollView,
     StatusBar,
     StyleSheet,
-    Text,
+    Text, ToastAndroid,
     View
 } from "react-native";
 import {Button, Card, Icon, Image} from "@rneui/themed";
@@ -122,11 +122,15 @@ const OrderScreen = ({route, navigation}) => {
         }
     };
 
+    const showToast = (message: string) => {
+        ToastAndroid.show(message, ToastAndroid.SHORT);
+    };
 
     const placeOrder = () => {
         try{
             const token = storage.getString("token")
             if(!token){
+                showToast("Login to continue order...")
                 navigation.navigate('login', {fromOrder: true});
             }else{
                 // populate request object
@@ -150,6 +154,7 @@ const OrderScreen = ({route, navigation}) => {
                         // success take to order status page
                         try{
                             storage.delete("cart");
+                            showToast("Order placed");
                             route.params.refreshCart();
                             route.params.gotToOrderStatusScreen(response.data.data._id);
                         }

@@ -22,15 +22,7 @@ const AppComponent = () => {
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName="qrScan">
-                <Stack.Screen name="home" component={HomeScreen} options={{
-                    header: ({ navigation, route, options, back }) => {
-                        const title = getHeaderTitle(options, route.name);
-                        return (
-                            <HeaderComponent navigation={navigation}/>
-                        );
-                    },
-                    gestureDirection: "horizontal"
-                }}/>
+                <Stack.Screen name="home" component={HomeScreen} options={{headerShown: false}}/>
                 <Stack.Screen name="pickupDelivery" component={PickupDeliveryScreen} options={{}}/>
                 <Stack.Screen name="itemViewer" component={ItemViewerScreen} options={{headerShown: false}}/>
                 <Stack.Screen name="cartScreen" component={CartScreen} options={{

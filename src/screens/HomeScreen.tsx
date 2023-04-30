@@ -18,13 +18,14 @@ import React, {useState} from "react";
 import axios, {AxiosResponse} from 'axios';
 import {CartItem, Category, Config, Item} from "../models/Restraunt";
 import {storage} from "./AppComponent";
-import {useFocusEffect, useIsFocused} from "@react-navigation/native";
+import {useFocusEffect} from "@react-navigation/native";
 import {config} from "../config/config";
 import { StackActions } from '@react-navigation/native';
+import HeaderComponent from "../components/HeaderComponent";
 
+// @ts-ignore
 const HomeScreen = ({ route, navigation }) => {
     const { url } = route.params;
-    const isFocused = useIsFocused();
     const [cart, setCart] = useState([]);
     const [orderType, setOrderType] = useState('pickup');
 
@@ -33,7 +34,6 @@ const HomeScreen = ({ route, navigation }) => {
     };
 
     const addToCart = (item: Item, selectedConfig: Config, quantity: number) => {
-        console.log(selectedConfig)
         if(selectedConfig)
             try{
                 let cartItem: CartItem = {
@@ -41,6 +41,7 @@ const HomeScreen = ({ route, navigation }) => {
                     quantity: quantity,
                     selectedConfig: selectedConfig
                 };
+                // @ts-ignore
                 setCart( [...cart, cartItem]);
                 showToast(`Added ${cartItem.item.name} to cart`);
             }
@@ -49,11 +50,13 @@ const HomeScreen = ({ route, navigation }) => {
             }
         else
             try{
+                // @ts-ignore
                 let cartItem: CartItem = {
                     item: item,
                     quantity: quantity,
-                    selectedConfig: { _id: 0, price: item.price, name: 'default'}
+                    selectedConfig: { _id: "0", price: item.price, name: 'default'}
                 };
+                // @ts-ignore
                 setCart( [...cart, cartItem]);
                 showToast(`Added ${cartItem.item.name} to cart`);
             }
@@ -64,12 +67,11 @@ const HomeScreen = ({ route, navigation }) => {
 
     const [bestSellers, setBestSellers] = React.useState<Item[]>([]);
     const [categories, setCategories] = React.useState<Category[]>([]);
+    // @ts-ignore
     const [categorySelected, setActiveCategory] = React.useState<Category>(null);
-    const [itemSelected, setItemSelected] = React.useState<Item>(null);
     const [refreshing, setRefreshing] = React.useState(false);
 
     const onRefresh = React.useCallback(() => {
-        console.log(`refreshed`)
         setRefreshing(true);
         try {
             loadData(storage.getString('url')).then((response: AxiosResponse) => processData(response)).catch(e => console.log(e));
@@ -79,11 +81,9 @@ const HomeScreen = ({ route, navigation }) => {
     }, []);
 
     const processData = (response: AxiosResponse) => {
-        console.log(`process data called`)
         setRefreshing(false);
         let filteredItems: Item[] = [];
         let categories: Category[] = [];
-        console.log(response.data.categories )
         response.data.categories.forEach((category: Category) => {
             category.items.forEach((item: Item) => { item.quantity = 1; if(item.bestselling) filteredItems.push(item) });
             categories.push(category);
@@ -106,7 +106,6 @@ const HomeScreen = ({ route, navigation }) => {
                     }
                 }).then((response) => {
                 try{
-                    console.log("RINFO GET")
                     storage.set('rinfo', JSON.stringify(response.data.user))
                 }catch(e){
                     console.log("Error storing restraunt info to storage")
@@ -118,7 +117,6 @@ const HomeScreen = ({ route, navigation }) => {
     };
 
     React.useEffect(() => {
-        console.log(`use effect`)
         // normal load
         try {
             storage.set(
@@ -138,7 +136,7 @@ const HomeScreen = ({ route, navigation }) => {
             console.log(`error saving cart in use effect with url ${url}`)
         }
 
-        const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+        const unsubscribe = navigation.addListener('beforeRemove', (e: any) => {
             e.preventDefault();
             Alert.alert(
                 'Discard changes?',
@@ -158,23 +156,10 @@ const HomeScreen = ({ route, navigation }) => {
         return unsubscribe;
     }, [navigation]);
 
-    // React.useEffect(() => {
-    //     const unsubscribe = navigation.addListener('focus', () => {
-    //         const { fromItemPicker, item, selectedConfig, quantity } = route.params;
-    //         console.log(`focus called with ${isFocused} ${fromItemPicker} ${selectedConfig} ${quantity}`);
-    //         if(fromItemPicker){
-    //             //coming from item viewing screen add to cart
-    //             addToCart(item, selectedConfig, quantity);
-    //         }
-    //     });
-    //     return unsubscribe;
-    // }, [route.params]);
-
     useFocusEffect(
         React.useCallback(() => {
             const unsubscribe = navigation.addListener('focus', () => {
                 let { fromItemPicker, item, selectedConfig, quantity } = route.params;
-                console.log(`focus called with ${isFocused} ${fromItemPicker} ${selectedConfig} ${quantity}`);
                 if(item)
                 addToCart(item, selectedConfig, quantity);
             });
@@ -183,9 +168,7 @@ const HomeScreen = ({ route, navigation }) => {
     );
 
     const loadData = (urlForLoad: any) => {
-        console.log("load data ", urlForLoad)
         const explodedUrl = urlForLoad.split('/');
-        console.log("exploded url" , explodedUrl)
         if(!explodedUrl[3])
             navigation.navigate('qrScan', {message : 'Invalid qrCode'});
 
@@ -200,13 +183,10 @@ const HomeScreen = ({ route, navigation }) => {
     }
 
     const setActiveCategoryForHome = (category: Category) => {
-        // console.log("set active category", category)
         setActiveCategory(category);
     };
 
     const setActiveItemForItemViewer = (item: Item) => {
-        setItemSelected(item);
-        // console.log("set active item", item)
         navigation.navigate('itemViewer', {item : item})
     };
 
@@ -239,6 +219,10 @@ const HomeScreen = ({ route, navigation }) => {
         }
     };
 
+    const goToLoginScreen = () => {
+        navigation.navigate('login', {fromOrder : false});
+    }
+
     const refreshApp = (action: any) => {
         navigation.dispatch(action);
     }
@@ -249,6 +233,7 @@ const HomeScreen = ({ route, navigation }) => {
 
     return (
         <View style={styles.container}>
+            <HeaderComponent route={route} navigation={navigation} goToLoginScreen={goToLoginScreen}></HeaderComponent>
             <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }>

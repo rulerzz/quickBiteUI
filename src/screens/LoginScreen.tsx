@@ -46,14 +46,19 @@ export default function LoginScreen({ route, navigation }) {
         }).then(response => {
             //success
             try{
-                storage.set("token", response.data.token)
-                storage.set("user", JSON.stringify(response.data.user))
-                if(fromOrder)
+                storage.set("token", response.data.token);
+                storage.set("user", JSON.stringify(response.data.user));
+                showToast("Successfully Logged In!");
+                if(fromOrder) {
+                    showToast("Navigating back to order screen");
                     navigation.goBack();
-                else
-                navigation.navigate('home', {})
+                }
+                else {
+                    showToast("Navigating back to home");
+                    navigation.navigate('home', {});
+                }
             }catch(e){
-                console.log("error saving JWT token")
+                console.log("error saving JWT token");
             }
         }).catch(error => {
             showToast("Incorrect user credentials")
